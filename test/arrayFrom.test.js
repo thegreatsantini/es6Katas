@@ -3,9 +3,10 @@
 // Follow the hints of the failure messages!
 
 const assert = require('chai').assert;
-var jsdom = require("jsdom").jsdom;
+const jsdom = require("jsdom");
+const { JSDOM } = jsdom;
 
-var document = jsdom("<body></body>");
+const dom = new JSDOM(`<body></body>`);
 
 describe('`Array.from` converts an array-like object or list into an Array', () => {
 
@@ -16,31 +17,29 @@ describe('`Array.from` converts an array-like object or list into an Array', () 
         assert.deepEqual(Array.from(arr), ['one', 'two']);
     });
 
-    xit('a DOM node`s classList object can be converted', function () {
-        document.body.classList = [];
-        document.body.classList.push('some');
-        document.body.classList.push('other');
+    it('a DOM node`s classList object can be converted', function () {
+        const domNode = dom.window.document.createElement('span');
+        domNode.classList.add('some');
+        domNode.classList.add('other');
         const classList = domNode.classList;
-        Console.log('this solution works')
         assert.equal('' + Array.from(classList), '' + ['some', 'other']);
     });
 
     it('convert a NodeList to an Array and `filter()` works on it', function () {
-        const nodeList = document.createElement('span');
+        const nodeList = dom.window.document.createElement('span');
         const divs = Array.from(nodeList).filter((node) => node.tagName === 'div');
-
         assert.deepEqual(divs.length, 0);
     });
 
     describe('custom conversion using a map function as second param', () => {
         it('we can modify the value before putting it in the array', function () {
-            const arr = Array.from(arrayLike, (value) => value);
+            const arr = Array.from(arrayLike, (value) => value.toUpperCase());
 
             assert.deepEqual(arr, ['ONE', 'TWO']);
         });
 
         it('and we also get the object`s key as second parameter', function () {
-            const arr = Array.from(arrayLike, (value) => `${key}=${value}`);
+            const arr = Array.from(arrayLike, (value, key) => `${key}=${value}`);
 
             assert.deepEqual(arr, ['0=one', '1=two']);
         });
